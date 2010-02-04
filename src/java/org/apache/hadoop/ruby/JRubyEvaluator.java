@@ -7,7 +7,7 @@ import java.io.Reader;
 
 import javax.script.ScriptException;
 
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.conf.Configuration;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.ScriptingContainer;
 
@@ -17,6 +17,7 @@ public class JRubyEvaluator {
 
 	/** invoke count is limited so that memory leaking */
 	private static final int INVOKE_LIMIT = 10000;
+	public static Configuration conf;
 
 	private static int invokeCounter = 0;
 
@@ -28,7 +29,7 @@ public class JRubyEvaluator {
 	/** hadoop ruby dsl file using in Hadoop mapper/reducer */
 	private String dslFileName;
 
-	public JRubyEvaluator(JobConf conf) {
+	public JRubyEvaluator() {
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
 
@@ -44,10 +45,10 @@ public class JRubyEvaluator {
 	}
 
 	public Object invoke(String methodName, Object key, Object value,
-			Object output, Object reporter) throws ScriptException {
+			Object context) throws ScriptException {
 		Object self = null; // if receiver is null, should use toplevel.
 		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
-				key, value, output, reporter, scriptFileName, dslFileName },
+				key, value, context, scriptFileName, dslFileName },
 				null);
 		invokeCounter++;
 		return result;

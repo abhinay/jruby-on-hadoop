@@ -12,10 +12,12 @@ import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileOutputFormat;
-import org.apache.hadoop.mapred.JobClient;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.io.LongWritable;
+
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
 import org.apache.hadoop.ruby.mapred.JRubyMapper;
 import org.apache.hadoop.ruby.mapred.JRubyReducer;
 import org.apache.hadoop.util.Tool;
@@ -27,12 +29,12 @@ public class JRubyJobRunner extends Configured implements Tool {
 		CommandLineParser parser = new GnuParser();
 		Options options = new Options();
 		options.addOption(new Option("script", true, "ruby script"));
-		options
-				.addOption(new Option("dslfile", true, "hadoop ruby DSL script"));
+		options.addOption(new Option("dslfile", true, "hadoop ruby DSL script"));
 
 		CommandLine commandLine = parser.parse(options, args);
-		JobConf conf = new JobConf(getConf(), JRubyJobRunner.class);
-		conf.setJobName("ruby.runner");
+		Configuration conf = getConf();
+		Job job = new Job(conf);
+		job.setJobName("ruby.runner");
 
 		if (commandLine.hasOption("script")) {
 			conf.set("mapred.ruby.script", commandLine.getOptionValue("script",
@@ -46,32 +48,32 @@ public class JRubyJobRunner extends Configured implements Tool {
 //		System.out.println(conf.get("mapred.ruby.script"));
 //		System.out.println(conf.get("mapred.ruby.dslfile"));
 
-		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(IntWritable.class);
+	  job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(IntWritable.class);
 
-		conf.setMapperClass(JRubyMapper.class);
-		conf.setCombinerClass(JRubyReducer.class);
-		conf.setReducerClass(JRubyReducer.class);
+		job.setMapperClass(JRubyMapper.class);
+		job.setReducerClass(JRubyReducer.class);
 
 		String[] otherArgs = commandLine.getArgs();
 		if (otherArgs.length >= 2) {
-			FileInputFormat.setInputPaths(conf, otherArgs[0]);
-			FileOutputFormat.setOutputPath(conf, new Path(otherArgs[1]));
+			FileInputFormat.setInputPaths(job, otherArgs[0]);
+			FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 		}
-
+		
 		// override by Ruby script
-		JRubyEvaluator evaluator = new JRubyEvaluator(conf);
+		JRubyEvaluator.conf = conf;
+		JRubyEvaluator evaluator = new JRubyEvaluator();
 		try {
 			Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
 			if (paths != null && paths.length == 2) {
-				FileInputFormat.setInputPaths(conf, (String) paths[0]);
-				FileOutputFormat.setOutputPath(conf, new Path((String) paths[1]));
+				FileInputFormat.setInputPaths(job, (String) paths[0]);
+				FileOutputFormat.setOutputPath(job, new Path((String) paths[1]));
 			}
 		} catch (ScriptException e) {
 			// do nothing. maybe user script has no "setup" method
 		}
 
-		JobClient.runJob(conf);
+		job.waitForCompletion(true);
 		return 0;
 	}
 

@@ -10,29 +10,29 @@ def wrap_setup(conf, script, dslfile)
   paths.to_java if paths
 end
 
-def wrap_map(key, value, output, reporter, script, dslfile)
+def wrap_map(key, value, context, script, dslfile)
   require script
-  output_wrapper = OutputWrapper.new(output)
+  context_wrapper = ContextWrapper.new(context)
   dslfile ? 
-    map(to_ruby(key), to_ruby(value), output_wrapper, reporter, dslfile) :
-    map(to_ruby(key), to_ruby(value), output_wrapper, reporter)
+    map(to_ruby(key), to_ruby(value), context_wrapper, dslfile) :
+    map(to_ruby(key), to_ruby(value), context_wrapper)
 end
 
-def wrap_reduce(key, values, output, reporter, script, dslfile)
+def wrap_reduce(key, values, context, script, dslfile)
   require script
-  output_wrapper = OutputWrapper.new(output)
+  context_wrapper = ContextWrapper.new(context)
   dslfile ?
-    reduce(to_ruby(key), to_ruby(values), output_wrapper, reporter, dslfile) :
-    reduce(to_ruby(key), to_ruby(values), output_wrapper, reporter)
+    reduce(to_ruby(key), to_ruby(values), context_wrapper, dslfile) :
+    reduce(to_ruby(key), to_ruby(values), context_wrapper)
 end
 
-class OutputWrapper
-  def initialize(output)
-    @output = output
+class ContextWrapper
+  def initialize(context)
+    @context = context
   end
 
   def collect(key, value)
-    @output.collect(to_java(key), to_java(value))
+    @context.write(to_java(key), to_java(value))
   end
 end
 

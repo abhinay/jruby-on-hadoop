@@ -1,29 +1,37 @@
 package org.apache.hadoop.ruby.mapred;
 
 import java.io.IOException;
+import java.lang.InterruptedException;
 
 import javax.script.ScriptException;
 
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.Mapper;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.io.IntWritable;
+
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.ruby.JRubyEvaluator;
 
-public class JRubyMapper extends JRubyMapRed implements
-		Mapper<LongWritable, Text, Text, IntWritable> {
+public class JRubyMapper extends Mapper<Object, Text, Text, IntWritable> {
+	
+	private JRubyEvaluator evaluator;
 
-	public void map(LongWritable key, Text value,
-			OutputCollector<Text, IntWritable> output, Reporter reporter)
-			throws IOException {
+	public JRubyMapper() {
+		evaluator = new JRubyEvaluator();
+	}
+
+	public JRubyEvaluator getJRubyEvaluator() {
+		return this.evaluator;
+	}
+	
+	public void map(Object key, Text value, Context context) throws IOException {
 		// invoke "map" method in ruby
 		JRubyEvaluator evaluator = getJRubyEvaluator();
 		try {
-			evaluator.invoke("wrap_map", key, value, output, reporter);
+			evaluator.invoke("wrap_map", key, value, context);
 		} catch (ScriptException e) {
-			reporter.setStatus(e.getMessage());
+			context.setStatus(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			evaluator.checkResource();
 		}

@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'jruby-jars'
 require 'jruby-on-hadoop/client'
 
