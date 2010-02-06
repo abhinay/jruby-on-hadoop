@@ -1,8 +1,4 @@
-# wordcount example
-
-# not necessary
 def setup(conf)
-  ['test/inputs', 'test/outputs']
 end
 
 def map(key, value, output, reporter)
