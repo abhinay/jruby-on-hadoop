@@ -17,7 +17,6 @@ public class JRubyEvaluator {
 
 	/** invoke count is limited so that memory leaking */
 	private static final int INVOKE_LIMIT = 10000;
-	public static Configuration conf;
 
 	private static int invokeCounter = 0;
 
@@ -29,7 +28,7 @@ public class JRubyEvaluator {
 	/** hadoop ruby dsl file using in Hadoop mapper/reducer */
 	private String dslFileName;
 
-	public JRubyEvaluator() {
+	public JRubyEvaluator(Configuration conf) {
 		scriptFileName = conf.get("mapred.ruby.script");
 		dslFileName = conf.get("mapred.ruby.dslfile");
 

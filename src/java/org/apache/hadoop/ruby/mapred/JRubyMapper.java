@@ -15,17 +15,12 @@ public class JRubyMapper extends Mapper<Object, Text, Text, IntWritable> {
 	
 	private JRubyEvaluator evaluator;
 
-	public JRubyMapper() {
-		evaluator = new JRubyEvaluator();
-	}
-
-	public JRubyEvaluator getJRubyEvaluator() {
-		return this.evaluator;
-	}
+	public void setup(Context context) throws IOException, InterruptedException {
+	  evaluator = new JRubyEvaluator(context.getConfiguration());
+  }
 	
 	public void map(Object key, Text value, Context context) throws IOException {
 		// invoke "map" method in ruby
-		JRubyEvaluator evaluator = getJRubyEvaluator();
 		try {
 			evaluator.invoke("wrap_map", key, value, context);
 		} catch (ScriptException e) {

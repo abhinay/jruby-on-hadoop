@@ -63,8 +63,7 @@ public class JRubyJobRunner extends Configured implements Tool {
 		}
 		
 		// override by Ruby script
-		JRubyEvaluator.conf = conf;
-		JRubyEvaluator evaluator = new JRubyEvaluator();
+		JRubyEvaluator evaluator = new JRubyEvaluator(conf);
 		try {
 			Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
 			if (paths != null && paths.length == 2) {

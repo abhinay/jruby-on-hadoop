@@ -15,18 +15,13 @@ public class JRubyReducer extends Reducer<Text, IntWritable, Text, IntWritable> 
 
 	private JRubyEvaluator evaluator;
 
-	public JRubyReducer() {
-		evaluator = new JRubyEvaluator();
-	}
-
-	public JRubyEvaluator getJRubyEvaluator() {
-		return this.evaluator;
-	}
+	public void setup(Context context) throws IOException, InterruptedException {
+	  evaluator = new JRubyEvaluator(context.getConfiguration());
+  }
 
 	public void reduce(Text key, Iterable<IntWritable> values, Context context)
 			throws IOException {
 		// invoke "reduce" method in ruby
-		JRubyEvaluator evaluator = getJRubyEvaluator();
 		try {
 			evaluator.invoke("wrap_reduce", key, values, context);
 		} catch (ScriptException e) {
