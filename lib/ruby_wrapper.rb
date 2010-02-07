@@ -34,6 +34,10 @@ class ContextWrapper
   def collect(key, value)
     @context.write(to_java(key), to_java(value))
   end
+  
+  def get_conf
+    @context.getConfiguration
+  end
 end
 
 def to_ruby(value)

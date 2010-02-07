@@ -32,9 +32,8 @@ public class JRubyJobRunner extends Configured implements Tool {
 		options.addOption(new Option("dslfile", true, "hadoop ruby DSL script"));
 
 		CommandLine commandLine = parser.parse(options, args);
-		Configuration conf = getConf();
-		Job job = new Job(conf);
-		job.setJobName("ruby.runner");
+		Job job = new Job(getConf());
+		Configuration conf = job.getConfiguration();
 
 		if (commandLine.hasOption("script")) {
 			conf.set("mapred.ruby.script", commandLine.getOptionValue("script",
@@ -44,17 +43,20 @@ public class JRubyJobRunner extends Configured implements Tool {
 			conf.set("mapred.ruby.dslfile", commandLine
 					.getOptionValue("dslfile"));
 		}
+		String[] otherArgs = commandLine.getArgs();
+		conf.setStrings("mapred.args", otherArgs);
+		
 //		System.out.println(options.toString());
 //		System.out.println(conf.get("mapred.ruby.script"));
 //		System.out.println(conf.get("mapred.ruby.dslfile"));
 
+    job.setJobName("ruby.runner");
 	  job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
 
 		job.setMapperClass(JRubyMapper.class);
 		job.setReducerClass(JRubyReducer.class);
 
-		String[] otherArgs = commandLine.getArgs();
 		if (otherArgs.length >= 2) {
 			FileInputFormat.setInputPaths(job, otherArgs[0]);
 			FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
@@ -72,7 +74,7 @@ public class JRubyJobRunner extends Configured implements Tool {
 		} catch (ScriptException e) {
 			// do nothing. maybe user script has no "setup" method
 		}
-
+		
 		job.waitForCompletion(true);
 		return 0;
 	}

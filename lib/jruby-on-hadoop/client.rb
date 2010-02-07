@@ -2,7 +2,7 @@ module JRubyOnHadoop
   JAVA_MAIN_CLASS = 'org.apache.hadoop.ruby.JRubyJobRunner' 
 
   class Client
-    attr_reader :script, :inputs, :outputs, :files
+    attr_reader :script, :files
 
     def initialize(args=[])
       @args = args
@@ -38,17 +38,15 @@ module JRubyOnHadoop
     end
 
     def parse_args
-      @script_path = @args.size > 0 ? @args[0] : 'mapred.rb'
+      raise "Usage: joh script_path input_path output_path" if @args.size < 3
+      @script_path = @args[0]
       @script = File.basename(@script_path) 
-      @inputs = @args[1] if @args.size == 3
-      @outputs = @args[2] if @args.size == 3
       @files = [@script_path, JRubyOnHadoop.wrapper_ruby_file]
     end
 
     def mapred_args
       args = "--script #{@script} "
-      args += "#{@inputs} " if @inputs
-      args += "#{@outputs}" if @outputs
+      (1..@args.size-1).each {|index| args += "#{@args[index]} "}
       args
     end
 
