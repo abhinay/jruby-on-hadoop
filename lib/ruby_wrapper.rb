@@ -42,7 +42,7 @@ end
 
 def to_ruby(value)
   case value
-  when IntWritable, LongWritable then value.get
+  when IntWritable, FloatWritable, LongWritable then value.get
   when Text then value.to_string
   else 
     # for Java array
@@ -56,6 +56,7 @@ end
 def to_java(value)
   case value
   when Integer then IntWritable.new(value)
+  when Float then FloatWritable.new(value)
   when String then t = Text.new; t.set(value); t
   when Array then value.to_java
   else raise "no match class: #{value.class}"
