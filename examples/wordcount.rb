@@ -1,4 +1,5 @@
 def setup(conf)
+  #configure org.apache.hadoop.conf.Configuration object
 end
 
 def map(key, value, context)

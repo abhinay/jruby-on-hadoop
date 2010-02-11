@@ -1,48 +1,44 @@
 = JRuby on Hadoop
 
-JRuby on Hadoop is a thin wrapper for Hadoop Mapper / Reducer by JRuby.
-We recommend to use this with hadoop-rubydsl on the github / gemcutter.
-
 == Description
+
+JRuby on Hadoop is a thin wrapper for Hadoop Mapper / Reducer by JRuby.
+This is a fork of the original project and works with Hadoop 0.20.1,
+whilst the original works with the deprecated Hadoop API for the latest version of Hadoop.
 
 == Install
 
 Required gems are all on GemCutter.
 
 1. Upgrade your rubygem to 1.3.5
-2. Install gems
- $ gem install jruby-on-hadoop
+2. Clone this project, build the gem and install it
 
 == Usage
 
 1. Run Hadoop cluster on your machines and set HADOOP_HOME env variable.
 2. put files into your hdfs. ex) test/inputs/file1
 3. Now you can run 'joh' like below:
- $ joh examples/wordcount.rb test/inputs test/outputs
+ $ joh examples/wordcount.rb test/inputs/file1 test/outputs
 You can get Hadoop job results in your hdfs test/outputs/part-*
 
 == Example 
 see also examples/wordcount.rb
 
- def setup(conf)
-   # setup jobconf
- end
+  def setup(conf)
+    #configure org.apache.hadoop.conf.Configuration object
+  end
 
- def map(key, value, output, reporter)
-   # mapper process
-   # (wordcount example)
-   value.split.each do |word|
-     output.collect(word, 1)
-   end
- end
- 
- def reduce(key, values, output, reporter)
-   # reducer process
-   # (wordcount example)
-   sum = 0
-   values.each {|v| sum += v }
-   output.collect(key, sum)
- end
+  def map(key, value, context)
+    value.split.each do |word|
+      context.collect(word, 1)
+    end
+  end
+
+  def reduce(key, values, context)
+    sum = 0
+    values.each {|v| sum += v }
+    context.collect(key, sum)
+  end
 
 == Build
 
@@ -50,10 +46,11 @@ You can build hadoop-ruby.jar by "ant".
  ant
 
 Required to set env HADOOP_HOME for your system.
-Assumed Hadoop version is 0.19.2.
+Assumed Hadoop version is 0.20.1.
 
-== Author
+== Authors
 Koichi Fujikawa <fujibee@gmail.com>
+Abhinay Mehta <abhinay.mehta@gmail.com>
 
 == Copyright
 License: Apache License
