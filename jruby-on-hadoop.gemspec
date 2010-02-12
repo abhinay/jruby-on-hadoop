@@ -28,13 +28,7 @@ Gem::Specification.new do |s|
      "lib/hadoop-ruby.jar",
      "lib/jruby-on-hadoop.rb",
      "lib/jruby-on-hadoop/client.rb",
-     "lib/ruby_wrapper.rb",
-     "spec/jruby-on-hadoop/client_spec.rb",
-     "spec/jruby-on-hadoop_spec.rb",
-     "spec/ruby_wrapper_spec.rb",
-     "test/java/org/apache/hadoop/ruby/JRubyJobRunnerTest.java",
-     "test/java/org/apache/hadoop/ruby/mapred/JRubyMapperTest.java",
-     "test/java/org/apache/hadoop/ruby/mapred/JRubyReducerTest.java"
+     "lib/ruby_wrapper.rb"
   ]
   s.homepage = %q{http://github.com/fujibee/jruby-on-hadoop}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -42,9 +36,6 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{JRuby on Hadoop}
   s.test_files = [
-    "spec/jruby-on-hadoop/client_spec.rb",
-     "spec/jruby-on-hadoop_spec.rb",
-     "spec/ruby_wrapper_spec.rb",
      "examples/wordcount.rb"
   ]
 

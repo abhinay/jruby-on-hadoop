@@ -51,7 +51,7 @@ module JRubyOnHadoop
     end
 
     def jruby_jars
-      [JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path]
+      [JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, main_jar_path]
     end
 
     def opt_libjars; jruby_jars.join(',') end
