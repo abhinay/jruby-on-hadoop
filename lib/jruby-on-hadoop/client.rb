@@ -40,8 +40,9 @@ module JRubyOnHadoop
     def parse_args
       raise "Usage: joh script_path input_path output_path" if @args.size < 3
       @script_path = @args[0]
-      @script = File.basename(@script_path) 
+      @script = File.basename(@script_path)
       @files = [@script_path, JRubyOnHadoop.wrapper_ruby_file]
+      @args.each {|arg| @files << arg if File.file?(arg) and !@files.include?(arg)}
     end
 
     def mapred_args

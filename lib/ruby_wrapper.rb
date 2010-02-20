@@ -12,7 +12,11 @@ def wrap_setup(conf, script, dslfile)
 end
 
 def wrap_map(key, value, context, script, dslfile)
-  require script
+  unless @required_script
+    require script
+    @required_script = true
+  end
+  
   context_wrapper = ContextWrapper.new(context)
   dslfile ? 
     map(to_ruby(key), to_ruby(value), context_wrapper, dslfile) :
@@ -20,7 +24,11 @@ def wrap_map(key, value, context, script, dslfile)
 end
 
 def wrap_reduce(key, values, context, script, dslfile)
-  require script
+  unless @required_script
+    require script
+    @required_script = true
+  end
+
   context_wrapper = ContextWrapper.new(context)
   dslfile ?
     reduce(to_ruby(key), to_ruby(values), context_wrapper, dslfile) :
