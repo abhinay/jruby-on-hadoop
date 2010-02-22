@@ -24,8 +24,8 @@ You can get Hadoop job results in your hdfs test/outputs/part-*
 == Example 
 see also examples/wordcount.rb
 
-  def setup(conf)
-    #configure org.apache.hadoop.conf.Configuration object
+  def setup(job)
+    #configure the MapReduce Job
   end
 
   def map(key, value, context)

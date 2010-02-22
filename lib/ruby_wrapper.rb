@@ -5,9 +5,9 @@ import 'org.apache.hadoop.io.FloatWritable'
 import 'org.apache.hadoop.io.LongWritable'
 import 'org.apache.hadoop.io.Text'
 
-def wrap_setup(conf, script, dslfile)
+def wrap_setup(job, script, dslfile)
   require script
-  paths = dslfile ? setup(conf, dslfile) : setup(conf)
+  paths = dslfile ? setup(job, dslfile) : setup(job)
   paths.to_java if paths
 end
 

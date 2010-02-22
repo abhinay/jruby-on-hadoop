@@ -35,10 +35,10 @@ public class JRubyEvaluator {
 		setupEngine();
 	}
 
-	public Object invoke(String methodName, Object conf) throws ScriptException {
+	public Object invoke(String methodName, Object job) throws ScriptException {
 		Object self = null; // if receiver is null, should use toplevel.
 		Object result = rubyEngine.callMethod(self, methodName, new Object[] {
-				conf, scriptFileName, dslFileName }, Object[].class);
+				job, scriptFileName, dslFileName }, Object[].class);
 		invokeCounter++;
 		return result;
 	}

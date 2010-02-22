@@ -32,9 +32,8 @@ public class JRubyJobRunner extends Configured implements Tool {
 		options.addOption(new Option("dslfile", true, "hadoop ruby DSL script"));
 
 		CommandLine commandLine = parser.parse(options, args);
-		Job job = new Job(getConf());
-		Configuration conf = job.getConfiguration();
-
+		Configuration conf = getConf();
+		
 		if (commandLine.hasOption("script")) {
 			conf.set("mapred.ruby.script", commandLine.getOptionValue("script",
 					"mapred.rb"));
@@ -46,10 +45,7 @@ public class JRubyJobRunner extends Configured implements Tool {
 		String[] otherArgs = commandLine.getArgs();
 		conf.setStrings("mapred.args", otherArgs);
 		
-//		System.out.println(options.toString());
-//		System.out.println(conf.get("mapred.ruby.script"));
-//		System.out.println(conf.get("mapred.ruby.dslfile"));
-
+    Job job = new Job(conf);
     job.setJobName("ruby.runner");
 	  job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
@@ -62,14 +58,13 @@ public class JRubyJobRunner extends Configured implements Tool {
 			FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 		}
 		
-		// override by Ruby script
-		JRubyEvaluator evaluator = new JRubyEvaluator(conf);
+		JRubyEvaluator evaluator = new JRubyEvaluator(job.getConfiguration());
 		try {
-			Object[] paths = (Object[]) evaluator.invoke("wrap_setup", conf);
+			Object[] paths = (Object[]) evaluator.invoke("wrap_setup", job);
 			if (paths != null && paths.length == 2) {
-				FileInputFormat.setInputPaths(job, (String) paths[0]);
-				FileOutputFormat.setOutputPath(job, new Path((String) paths[1]));
-			}
+  			FileInputFormat.setInputPaths(job, (String) paths[0]);
+  			FileOutputFormat.setOutputPath(job, new Path((String) paths[1]));
+  		}
 		} catch (ScriptException e) {
 			// do nothing. maybe user script has no "setup" method
 		}

@@ -1,5 +1,5 @@
-def setup(conf)
-  #configure org.apache.hadoop.conf.Configuration object
+def setup(job)
+  #configure the MapReduce Job
 end
 
 def map(key, value, context)
