@@ -44,19 +44,11 @@ public class JRubyJobRunner extends Configured implements Tool {
 		}
 		String[] otherArgs = commandLine.getArgs();
 		conf.setStrings("mapred.args", otherArgs);
-		
+
     Job job = new Job(conf);
     job.setJobName("ruby.runner");
 	  job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
-
-		job.setMapperClass(JRubyMapper.class);
-		job.setReducerClass(JRubyReducer.class);
-
-		if (otherArgs.length >= 2) {
-			FileInputFormat.setInputPaths(job, otherArgs[0]);
-			FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
-		}
 		
 		JRubyEvaluator evaluator = new JRubyEvaluator(job.getConfiguration());
 		try {
@@ -68,8 +60,16 @@ public class JRubyJobRunner extends Configured implements Tool {
 		} catch (ScriptException e) {
 			// do nothing. maybe user script has no "setup" method
 		}
-		
+
+		if (otherArgs.length >= 2) {
+			FileInputFormat.setInputPaths(job, otherArgs[0]);
+			FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
+		}
+
+		job.setMapperClass(JRubyMapper.class);
+		job.setReducerClass(JRubyReducer.class);
 		job.waitForCompletion(true);
+		
 		return 0;
 	}
 
