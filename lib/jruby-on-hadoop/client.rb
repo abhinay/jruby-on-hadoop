@@ -42,8 +42,10 @@ module JRubyOnHadoop
       @script = File.basename(@script_path)
       @files = [@script_path, JRubyOnHadoop.wrapper_ruby_file]
       @dirnames = [File.dirname(@script_path)]
-      @args.each do |arg|
-        if File.file?(arg) and !@files.include?(arg) 
+
+      # ignore the first arg which we know is the script arg
+      @args[1..-1].each do |arg|
+        if File.file?(arg)
           @files << arg
           @dirnames << File.dirname(arg)
         end
@@ -52,8 +54,9 @@ module JRubyOnHadoop
 
     def mapred_args
       args = "--script #{@script} "
-      (1..@args.size-1).each do |index| 
-        arg = @args[index]
+
+      # ignore the first arg which we know is the script arg
+      @args[1..-1].each do |arg|
         arg = File.basename(arg) if File.file?(arg)
         args += "#{arg} "
       end
@@ -62,6 +65,10 @@ module JRubyOnHadoop
 
     def jruby_jars
       [JRubyJars.core_jar_path, JRubyJars.stdlib_jar_path, main_jar_path]
+    end
+    
+    def archive_file?(file)
+      File.file?(file) && %w(.zip .jar .tar .gz).include?(File.extname(file))
     end
 
     def opt_libjars; jruby_jars.join(',') end

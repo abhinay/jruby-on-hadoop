@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'jruby-jars'
-require 'jruby-on-hadoop/client'
+require File.join(File.dirname(__FILE__), 'jruby-on-hadoop', 'client')
 
 module JRubyOnHadoop
 
